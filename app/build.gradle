@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(path: ':library')
+//    implementation project(path: ':library')
+    implementation 'com.wolongalick:PercentRatingBar:1.0.0'
 
 }
