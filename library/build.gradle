@@ -32,19 +32,18 @@ dependencies {
 
 }
 
-/** 以下开始是将Android Library上传到jcenter的相关配置**/
-//项目主页
-def siteUrl = 'https://github.com/wolongalick/PercentRatingBar'
 publish{
-    repoName = 'maven'//远程仓库名字,不指明，默认是上传到maven
-    userOrg = 'wolongalick'//bintray.com的用户名
-    groupId = 'com.wolongalick'//jcenter上的路径
-    artifactId = 'PercentRatingBar'//项目名称
-    publishVersion = '1.0.0'//版本号
-    desc = '一个按可以按滑动百分比来评分的控件'//描述，不重要
-    website = siteUrl//项目主页
+    repoName = 'maven'
+    userOrg = 'wolongalick'
+    groupId = 'com.wolongalick'
+    artifactId = 'PercentRatingBar'
+    publishVersion = '1.0.0'
+    desc = '一个按可以按滑动百分比来评分的控件'
+    website = 'https://github.com/wolongalick/PercentRatingBar'//项目主页
 }
-tasks.withType(Javadoc) {//防止编码问题
+
+//防止编码问题
+tasks.withType(Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
     options.addStringOption('encoding', 'UTF-8')
     options.addStringOption('charSet', 'UTF-8')
