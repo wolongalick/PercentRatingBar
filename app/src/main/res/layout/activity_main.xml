@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <com.wolongalick.percent_rating_bar.PercentRatingBar
+        android:id="@+id/percentRatingBar"
+        android:background="#80BDE89E"
+        android:layout_width="wrap_content"
+        android:padding="20dp"
+        app:ratingStaredImg="@drawable/selected_star"
+        app:ratingNotStarImg="@drawable/not_select_star"
+        app:ratingSelectedCount="3.7"
+        app:ratingMaxCount="10"
+        app:ratingPadding="2dp"
+        app:ratingStep="exactly"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvCurrentRatingValue"
+        android:text="当前分值:3.7分"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingEnd="10dp"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="调整星星总个数:" />
+
+        <SeekBar
+            android:id="@+id/skRatingMaxCount"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:progress="10"
+            android:max="10"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:paddingEnd="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="调整分数:" />
+
+        <SeekBar
+            android:id="@+id/skRatingSelectedCount"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:progress="37"
+            android:max="100"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:paddingEnd="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="调整星星间距:" />
+
+        <SeekBar
+            android:id="@+id/skRatingPadding"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:progress="2"
+            android:max="80"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="更改星星的图标" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:src="@drawable/red_star"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:onClick="updateRatingImageRed" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/yellow_star"
+            android:layout_height="wrap_content"
+            android:onClick="updateRatingImageYellow" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/blue_star"
+            android:layout_height="wrap_content"
+            android:onClick="updateRatingImageBlue" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="更改步长:"
+            android:layout_height="wrap_content" />
+
+        <RadioGroup
+            android:id="@+id/rg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/rb3"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="整颗星"
+                android:onClick="stepFull" />
+
+            <RadioButton
+                android:id="@+id/rb2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="半颗星"
+                android:onClick="stepHalf" />
+
+            <RadioButton
+                android:id="@+id/rb3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="精确到像素级别"
+                android:onClick="stepExactly" />
+
+        </RadioGroup>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="重置UI"
+        android:onClick="resetUI" />
+
+
+</LinearLayout>
