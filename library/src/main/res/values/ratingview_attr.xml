@@ -7,6 +7,7 @@
         <attr name="ratingSelectedCount" format="float"/>   <!--选中的星星个数(支持小数)-->
         <attr name="ratingMaxCount" format="integer"/>      <!--最大星星个数-->
         <attr name="ratingPadding" format="dimension"/>     <!--星星之间的间距,单位px-->
+        <attr name="ratingIsSupportDrag" format="boolean"/> <!--是否支持拖动-->
         <attr name="ratingStep" format="enum">        <!--星星渲染模式-->
             <enum name="full" value="0"/>       <!--整颗星-->
             <enum name="half" value="1"/>       <!--半颗星-->

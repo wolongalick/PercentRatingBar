@@ -23,6 +23,7 @@
             app:ratingMaxCount="10"
             app:ratingPadding="2dp"
             app:ratingStep="exactly"
+            app:ratingIsSupportDrag="false"
             android:layout_height="wrap_content" />
     </RelativeLayout>
 

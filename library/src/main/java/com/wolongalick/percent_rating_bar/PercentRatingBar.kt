@@ -42,6 +42,7 @@ class PercentRatingBar : ViewGroup {
     private var mStaredImageRes = 0                          //选中的星星图片资源id
     private var mNotStarImageRes = 0                         //未选中的星星图片资源id
     private var mRatingPadding = 0                           //星星之间的间距,单位px
+    private var mRatingIsSupportDrag = true                  //是否支持拖动
 
     var onRatingChangeListener = { ratingValue: Float -> Unit }
 
@@ -67,11 +68,15 @@ class PercentRatingBar : ViewGroup {
         ratingSelectedCount = array.getFloat(R.styleable.PercentRatingBar_ratingSelectedCount, 0f)
         mRatingPadding = array.getDimensionPixelSize(R.styleable.PercentRatingBar_ratingPadding, 0)
         mRatingStep = array.getInteger(R.styleable.PercentRatingBar_ratingStep, RATING_STEP_FULL)
+        mRatingIsSupportDrag = array.getBoolean(R.styleable.PercentRatingBar_ratingIsSupportDrag, true)
 
         array.recycle()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if(!mRatingIsSupportDrag){
+            return super.onTouchEvent(event)
+        }
         //将星星和间距作为一组控件块
         val chunkWidth = starImgWidth + mRatingPadding
 
