@@ -5,6 +5,8 @@
 
 ![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo.gif)
 
+![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/explain.png)
+
 # 演示视频链接
 https://v.youku.com/v_show/id_XNDk1MjU4Nzg1Mg==
 
