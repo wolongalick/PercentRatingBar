@@ -1,9 +1,9 @@
 # PercentRatingBar
 百分比评分控件
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/079533118d624aa38e65ec73f3febf37~tplv-k3u1fbpfcp-watermark.image)
+![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo_cover.jpg)
 
-![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d7496e3e0b6d4413b09657d03f85921a~tplv-k3u1fbpfcp-watermark.image)
+![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo.gif)
 
 # 依赖方式
 ```gradle
