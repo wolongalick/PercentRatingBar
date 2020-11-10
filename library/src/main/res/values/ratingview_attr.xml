@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <declare-styleable name="PercentRatingBar">
-        <attr name="ratingStaredImg" format="reference"/>   <!--选中的星星图片资源id-->
-        <attr name="ratingNotStarImg" format="reference"/>  <!--未选中的星星图片资源id-->
-        <attr name="ratingSelectedCount" format="float"/>   <!--选中的星星个数(支持小数)-->
-        <attr name="ratingMaxCount" format="integer"/>      <!--最大星星个数-->
-        <attr name="ratingPadding" format="dimension"/>     <!--星星之间的间距,单位px-->
-        <attr name="ratingIsSupportDrag" format="boolean"/> <!--是否支持拖动-->
-        <attr name="ratingStep" format="enum">        <!--星星渲染模式-->
+        <attr name="ratingSelectedImg" format="reference"/>     <!--选中的星星图片资源id-->
+        <attr name="ratingNotSelectImg" format="reference"/>    <!--未选中的星星图片资源id-->
+        <attr name="ratingSelectedScore" format="float"/>       <!--评分(支持小数)-->
+        <attr name="ratingTotalScore" format="integer"/>        <!--总分数-->
+        <attr name="ratingPadding" format="dimension"/>         <!--星星之间的间距,单位px-->
+        <attr name="ratingIsSupportDrag" format="boolean"/>     <!--是否支持拖动-->
+        <attr name="ratingStep" format="enum">                  <!--星星渲染模式-->
             <enum name="full" value="0"/>       <!--整颗星-->
             <enum name="half" value="1"/>       <!--半颗星-->
             <enum name="exactly" value="2"/>    <!--精确到具体刻度比例-->
         </attr>
-
     </declare-styleable>
 </resources>

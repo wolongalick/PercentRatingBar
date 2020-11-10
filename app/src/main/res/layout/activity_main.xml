@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
+    android:id="@+id/llRoot"
     tools:context=".MainActivity">
 
 
@@ -17,11 +18,12 @@
             android:background="#80BDE89E"
             android:layout_width="wrap_content"
             android:padding="20dp"
-            app:ratingStaredImg="@drawable/selected_star"
-            app:ratingNotStarImg="@drawable/not_select_star"
-            app:ratingSelectedCount="3.7"
-            app:ratingMaxCount="10"
+            app:ratingSelectedImg="@drawable/selected_star"
+            app:ratingNotSelectImg="@drawable/not_select_star"
+            app:ratingSelectedScore="3.7"
+            app:ratingTotalScore="10"
             app:ratingPadding="2dp"
+            app:ratingIsSupportDrag="true"
             app:ratingStep="exactly"
             android:layout_height="wrap_content" />
     </RelativeLayout>

@@ -11,7 +11,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -37,8 +37,8 @@ publish{
     userOrg = 'wolongalick'
     groupId = 'com.wolongalick.widget'
     artifactId = 'PercentRatingBar'
-    publishVersion = '1.0.0'
-    desc = '一个按可以按滑动百分比来评分的控件'
+    publishVersion = '1.0.1'
+    desc = '一个可以按滑动百分比来评分的控件'
     website = 'https://github.com/wolongalick/PercentRatingBar'//项目主页
 }
 

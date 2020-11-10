@@ -24,30 +24,31 @@ class PercentRatingBar : View {
     companion object {
         const val TAG: String = "PercentRatingBar"
 
-        const val RATING_STEP_FULL = 0
-        const val RATING_STEP_HALF = 1
-        const val RATING_STEP_EXACTLY = 2
+        const val RATING_STEP_FULL = 0                          //整颗星
+        const val RATING_STEP_HALF = 1                          //半颗星
+        const val RATING_STEP_EXACTLY = 2                       //精确到具体刻度比例
     }
 
-    private val defaultRatingMaxCount = 5                   //默认星星最大个数为5星
-    private var starImgWidth = 0                            //星星宽度
-    private var starImgHeight = 0                           //星星高度
-    private var mContext: Context                           //上下文
-    private lateinit var staredBitmap: Bitmap               //选中的星星bitmap
-    private lateinit var notStarBitmap: Bitmap              //未选中的星星bitmap
+    private val defaultRatingTotalCount = 5                     //默认星星总个数为5星
+    private var mStarImgWidth = 0                               //星星宽度
+    private var mStarImgHeight = 0                              //星星高度
+    private var mContext: Context                               //上下文
+    private lateinit var staredBitmap: Bitmap                   //选中的星星bitmap
+    private lateinit var notStarBitmap: Bitmap                  //未选中的星星bitmap
 
-    private var ratingMaxCount: Int = defaultRatingMaxCount //最大星星个数
-    private var ratingSelectedCount: Float = 0f             //选中的星星个数(支持小数)
-    private var mRatingStep: Int = 1
-    private var mStaredImageRes = 0                          //选中的星星图片资源id
-    private var mNotStarImageRes = 0                         //未选中的星星图片资源id
-    private var mRatingPadding = 0                           //星星之间的间距,单位px
-    private var mRatingIsSupportDrag = true                  //是否支持拖动
+    private var mTotalScore: Int = defaultRatingTotalCount      //总分数
+    private var mSelectedCount: Float = 0f                      //评分(支持小数)
+    private var mStep: Int = 1
+    private var mSelectedImg = 0                                //选中的星星图片资源id
+    private var mNotSelectImg = 0                               //未选中的星星图片资源id
+    private var mRatingPadding = 0                              //星星之间的间距,单位px
+    private var mIsSupportDrag = true                           //是否支持拖动
 
     var onRatingChangeListener = { ratingValue: Float -> Unit }
 
     constructor(context: Context) : super(context) {
         mContext = context
+        initView(null)
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
@@ -55,30 +56,37 @@ class PercentRatingBar : View {
         initView(attrs)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context, attrs, defStyleAttr
+    ) {
         mContext = context
         initView(attrs)
     }
 
     private fun initView(attrs: AttributeSet?) {
         val array = context.obtainStyledAttributes(attrs, R.styleable.PercentRatingBar)
-        mStaredImageRes = array.getResourceId(R.styleable.PercentRatingBar_ratingStaredImg, R.drawable.selected_star)
-        mNotStarImageRes = array.getResourceId(R.styleable.PercentRatingBar_ratingNotStarImg, R.drawable.not_select_star)
-        ratingMaxCount = array.getInteger(R.styleable.PercentRatingBar_ratingMaxCount, defaultRatingMaxCount)
-        ratingSelectedCount = array.getFloat(R.styleable.PercentRatingBar_ratingSelectedCount, 0f)
+        mSelectedImg = array.getResourceId(
+            R.styleable.PercentRatingBar_ratingSelectedImg, R.drawable.selected_star
+        )
+        mNotSelectImg = array.getResourceId(
+            R.styleable.PercentRatingBar_ratingNotSelectImg, R.drawable.not_select_star
+        )
+        mTotalScore =
+            array.getInteger(R.styleable.PercentRatingBar_ratingTotalScore, defaultRatingTotalCount)
+        mSelectedCount = array.getFloat(R.styleable.PercentRatingBar_ratingSelectedScore, 0f)
         mRatingPadding = array.getDimensionPixelSize(R.styleable.PercentRatingBar_ratingPadding, 0)
-        mRatingStep = array.getInteger(R.styleable.PercentRatingBar_ratingStep, RATING_STEP_FULL)
-        mRatingIsSupportDrag = array.getBoolean(R.styleable.PercentRatingBar_ratingIsSupportDrag, true)
+        mStep = array.getInteger(R.styleable.PercentRatingBar_ratingStep, RATING_STEP_FULL)
+        mIsSupportDrag = array.getBoolean(R.styleable.PercentRatingBar_ratingIsSupportDrag, true)
 
         array.recycle()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if(!mRatingIsSupportDrag){
+        if (!mIsSupportDrag) {
             return super.onTouchEvent(event)
         }
         //将星星和间距作为一组控件块
-        val chunkWidth = starImgWidth + mRatingPadding
+        val chunkWidth = mStarImgWidth + mRatingPadding
 
         //计算出包含多少个控件块,也就是占多少颗星,多少分
         var newCount = ((event.x - paddingStart.toFloat()) / chunkWidth)
@@ -87,7 +95,7 @@ class PercentRatingBar : View {
         val starPaddingPercent: Float = (newCount - newCount.toInt())
 
         //计算出多滑出的百分比(一颗星的)
-        var starPercent: Float = chunkWidth * starPaddingPercent / starImgWidth
+        var starPercent: Float = chunkWidth * starPaddingPercent / mStarImgWidth
 
         //将一颗星的百分比强制限制到1也就是100%
         if (starPercent > 1) {
@@ -99,10 +107,10 @@ class PercentRatingBar : View {
         newCount = adjustRatingSelectedCount(newCount)
 
 
-        if (ratingSelectedCount != newCount) {
+        if (mSelectedCount != newCount) {
             onRatingChangeListener(newCount)
         }
-        ratingSelectedCount = newCount
+        mSelectedCount = newCount
         invalidate()
         return true
     }
@@ -110,41 +118,51 @@ class PercentRatingBar : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (ratingSelectedCount > ratingMaxCount) {
-            //限制评分,最高只能设置为最大值
-            ratingSelectedCount = ratingMaxCount.toFloat()
+        if (mSelectedCount > mTotalScore) {
+            //限制评分,最高只能设置为星星总个数
+            mSelectedCount = mTotalScore.toFloat()
         }
 
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         //绘制底部灰色星(未选中的)
-        for (i in ratingSelectedCount.toInt() until ratingMaxCount) {
-            canvas.drawBitmap(notStarBitmap, paddingStart + i * (starImgWidth.toFloat() + mRatingPadding), paddingTop.toFloat(), paint)
+        for (i in mSelectedCount.toInt() until mTotalScore) {
+            canvas.drawBitmap(
+                notStarBitmap,
+                paddingStart + i * (mStarImgWidth.toFloat() + mRatingPadding),
+                paddingTop.toFloat(),
+                paint
+            )
         }
 
         //绘制黄色星(选中的)
-        for (i in 0 until ratingSelectedCount.toInt()) {
-            canvas.drawBitmap(staredBitmap, paddingStart + i * (starImgWidth.toFloat() + mRatingPadding), paddingTop.toFloat(), paint)
+        for (i in 0 until mSelectedCount.toInt()) {
+            canvas.drawBitmap(
+                staredBitmap,
+                paddingStart + i * (mStarImgWidth.toFloat() + mRatingPadding),
+                paddingTop.toFloat(),
+                paint
+            )
         }
 
         //绘制半颗星
-        val fractional = ratingSelectedCount - ratingSelectedCount.toInt()
+        val fractional = mSelectedCount - mSelectedCount.toInt()
         if (fractional > 0) {
-            val left = paddingStart + ratingSelectedCount.toInt() * (starImgWidth.toFloat() + mRatingPadding).toInt()
-            val right = left + (starImgWidth * fractional).toInt()
+            val left =
+                paddingStart + mSelectedCount.toInt() * (mStarImgWidth.toFloat() + mRatingPadding).toInt()
+            val right = left + (mStarImgWidth * fractional).toInt()
             //裁剪半颗星
             canvas.clipRect(left, paddingTop, right, paddingTop + staredBitmap.height)
             canvas.drawBitmap(staredBitmap, left.toFloat(), paddingTop.toFloat(), paint)
         }
     }
 
-    override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
-
-    }
-
+    /**
+     * 调整选中的星星个数
+     */
     private fun adjustRatingSelectedCount(ratingSelectedCount: Float): Float {
         var newRatingSelectedCount: Float
-        when (mRatingStep) {
+        when (mStep) {
             RATING_STEP_FULL -> {
                 newRatingSelectedCount = ratingSelectedCount.roundToInt().toFloat()
             }
@@ -167,12 +185,92 @@ class PercentRatingBar : View {
 
         if (newRatingSelectedCount < 0) {
             newRatingSelectedCount = 0f
-        } else if (newRatingSelectedCount > ratingMaxCount) {
-            newRatingSelectedCount = ratingMaxCount.toFloat()
+        } else if (newRatingSelectedCount > mTotalScore) {
+            newRatingSelectedCount = mTotalScore.toFloat()
         }
 
         return newRatingSelectedCount
     }
+
+    /**
+     * 设置总分数
+     */
+    fun setTotalScore(value: Int) {
+        mTotalScore = value
+        requestLayout()
+        invalidate()
+    }
+
+    /**
+     * 设置分数
+     */
+    fun setScore(value: Float) {
+        val newValue = adjustRatingSelectedCount(value)
+        if (mSelectedCount != newValue) {
+            onRatingChangeListener(newValue)
+        }
+        mSelectedCount = newValue
+        invalidate()
+    }
+
+    /**
+     * 设置步长
+     * @see PercentRatingBar.RATING_STEP_FULL
+     * @see PercentRatingBar.RATING_STEP_HALF
+     * @see PercentRatingBar.RATING_STEP_EXACTLY
+     */
+    fun setStep(@RatingStep ratingStep: Int) {
+        mStep = ratingStep
+        invalidate()
+    }
+
+    /**
+     * 设置星星图片资源id
+     */
+    fun setImageRes(selectedImg: Int, notSelectImg: Int) {
+        mSelectedImg = selectedImg
+        mNotSelectImg = notSelectImg
+        requestLayout()
+        invalidate()
+    }
+
+    /**
+     * 设置星星间距(单位:px)
+     */
+    fun setRatingPadding(ratingPadding: Int) {
+        mRatingPadding = ratingPadding
+        requestLayout()
+        invalidate()
+    }
+
+    /**
+     * 获取总分数
+     */
+    fun getTotalScore(): Int {
+        return mTotalScore
+    }
+
+    /**
+     * 获取分数
+     */
+    fun getScore(): Float {
+        return mSelectedCount
+    }
+
+    /**
+     * 设置是否支持拖动(默认支持)
+     */
+    fun setRatingIsSupportDrag(ratingIsSupportDrag: Boolean) {
+        mIsSupportDrag = ratingIsSupportDrag
+    }
+
+    /**
+     * 是否支持拖动(默认支持)
+     */
+    fun getRatingIsSupportDrag(): Boolean {
+        return mIsSupportDrag
+    }
+
 
     @Override
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -181,13 +279,14 @@ class PercentRatingBar : View {
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         // 获取高-测量规则的模式和大小
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-        staredBitmap = BitmapFactory.decodeResource(resources, mStaredImageRes)
-        notStarBitmap = BitmapFactory.decodeResource(resources, mNotStarImageRes)
-        starImgWidth = staredBitmap.width
-        starImgHeight = staredBitmap.height
+        staredBitmap = BitmapFactory.decodeResource(resources, mSelectedImg)
+        notStarBitmap = BitmapFactory.decodeResource(resources, mNotSelectImg)
+        mStarImgWidth = staredBitmap.width
+        mStarImgHeight = staredBitmap.height
 
-        val mWidth = ratingMaxCount * (starImgWidth.toFloat() + mRatingPadding).toInt() - mRatingPadding + paddingStart + paddingEnd
-        val mHeight = starImgHeight + paddingTop + paddingBottom
+        val mWidth =
+            mTotalScore * (mStarImgWidth.toFloat() + mRatingPadding).toInt() - mRatingPadding + paddingStart + paddingEnd
+        val mHeight = mStarImgHeight + paddingTop + paddingBottom
 
         // 当布局参数设置为wrap_content时，设置默认值
         if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT && getLayoutParams().height == ViewGroup.LayoutParams.WRAP_CONTENT) {
@@ -199,47 +298,4 @@ class PercentRatingBar : View {
             setMeasuredDimension(widthSize, mHeight)
         }
     }
-
-
-    fun setRatingMaxCount(value: Int) {
-        ratingMaxCount = value
-        requestLayout()
-        invalidate()
-    }
-
-    fun setRatingSelectedCount(value: Float) {
-        val newValue = adjustRatingSelectedCount(value)
-        if (ratingSelectedCount != newValue) {
-            onRatingChangeListener(newValue)
-        }
-        ratingSelectedCount = newValue
-        invalidate()
-    }
-
-    fun setRatingStep(@RatingStep ratingStep: Int) {
-        mRatingStep = ratingStep
-        invalidate()
-    }
-
-    fun setStaredImageRes(staredImageRes: Int, notStarImageRes: Int) {
-        mStaredImageRes = staredImageRes
-        mNotStarImageRes = notStarImageRes
-        requestLayout()
-        invalidate()
-    }
-
-    fun setRatingPadding(ratingPadding: Int) {
-        mRatingPadding = ratingPadding
-        requestLayout()
-        invalidate()
-    }
-
-    fun getRatingMaxCount(): Int {
-        return ratingMaxCount
-    }
-
-    fun getRatingSelectedCount(): Float {
-        return ratingSelectedCount
-    }
-
 }
