@@ -1,17 +1,14 @@
 # PercentRatingBar
 百分比评分控件
 
-![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo_cover.jpg)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/079533118d624aa38e65ec73f3febf37~tplv-k3u1fbpfcp-watermark.image)
 
-![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo.gif)
+![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d7496e3e0b6d4413b09657d03f85921a~tplv-k3u1fbpfcp-watermark.image)
 
-![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/explain.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/29750755ec5642f9b8524ef92e8c85a0~tplv-k3u1fbpfcp-watermark.image)
 
-# 演示视频链接
-https://v.youku.com/v_show/id_XNDk1MjU4Nzg1Mg==
-
-# 导入
-```
+# 依赖方式
+```gradle
 buildscript {
     repositories {
         google()
@@ -19,20 +16,18 @@ buildscript {
     }
 }
 ```
-
-
-```
+```gradle
 dependencies {
     implementation 'com.wolongalick.widget:PercentRatingBar:1.0.1'
 }
 ```
+
 # 快速使用
 ```xml
 <com.wolongalick.widget.PercentRatingBar
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"/>
 ```
-
 # 完整使用
 ```xml
 <com.wolongalick.widget.PercentRatingBar
@@ -49,6 +44,7 @@ dependencies {
     app:ratingStep="exactly"
     />
 ```
+
 # 自定义属性详解
 
 属性名 | 含义| 对应java/kotlin方法
@@ -61,398 +57,166 @@ ratingPadding| 星星之间的间距,单位px | setRatingPadding(Int)
 ratingIsSupportDrag| 是否支持拖动 | setRatingIsSupportDrag(Boolean)和getRatingIsSupportDrag()
 ratingStep| 星星步长(full:整颗星、half:半颗星、exactly:精确到具体刻度比例) | setStep(@RatingStep step: Int)
 
-# 业务需求
-1. 支持按百分比评分
-2. 支持整颗星和半颗星
-3. 支持滑动和点击评分
-4. 支持自定义星星图标和星星间距
+# 前言
+公司的产品需要一个评分控件,并且分数并不仅仅是1.5、2.5这样的，而是要支持1.1、1.9分，并且星星的评分样式也要与分值完全对应
+也就是要实现这种效果
 
-# 实现思路
-1. 先for循环绘制灰色星(未选中的)
-2. 在for循环绘制黄色星(选中的整颗星)
-3. 由于需要支持小数的评分,那么就需要绘制那颗残缺的星星
-4. 由于需要支持滑动评分,那么需要重写onTouch方法来计算x轴坐标,并将x转化为评分
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/800d1d17602c468f9511cab4ef258428~tplv-k3u1fbpfcp-watermark.image)
 
-# 具体步骤代码 
-1. for循环绘制灰色星
+我一听就懵逼了,这不是为难我么
+
+![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3d114f8615f642f5adbc87bb26513e39~tplv-k3u1fbpfcp-watermark.image)
+
+不过既然产品既然提了需求,咱也得尽量去实现,否则以后还怎么愉快玩耍
+
+![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f57e94a5cf7e42478a131bfbc0811fe8~tplv-k3u1fbpfcp-watermark.image)
+
+# 需求描述
+1. 支持整颗星、半颗星和按百分比评分
+2. 支持滑动和点击评分
+3. 支持自定义星星图标和星星间距
+4. 支持...好了闭嘴吧...咱都给你实现了
+
+# 需求分析
+1. 首先绘制星星很简单,调用canvas.drawBitmap就可以,多个星星for循环绘制即可
+2. 复杂的地方有两处:a.如何绘制残缺星星,b:如果在滑动时,将滑动位置转化为分数
+
+# 开始写demo
+
+## 我们先画一颗星看看效果
+![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d4013f687fbd4237851d37da82b91911~tplv-k3u1fbpfcp-watermark.image)
+
+不过没关系,我们可以换个改为在onMeasure中获取bitmap,并将其作为全局变量存起来(因为后面要讲到计算星星的宽高以及整个自定义view宽高,所以本身也是需要在onMeasure中写的)
+
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/74a0cf7f13f74434a6faab1d475ef6e8~tplv-k3u1fbpfcp-watermark.image)
+
+## 再来绘制五颗星
+好,一颗星我们画完了,那么5颗星就for循环呗
 ```kotlin
-for (i in mSelectedCount.toInt() until mTotalScore) {
-    canvas.drawBitmap(
-        notStarBitmap,
-        paddingStart + i * (mStarImgWidth.toFloat() + mRatingPadding),
-        paddingTop.toFloat(),
-        paint
-    )
+override fun onDraw(canvas: Canvas) {
+    super.onDraw(canvas)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    //绘制底部灰色星(未选中的)
+    for (i in 0 until 5) {
+        canvas.drawBitmap(
+            staredBitmap,
+            i * mStarImgWidth.toFloat(),//这里要记得每颗星星要向右偏移,否则5颗星星就重合了
+            0f,
+            paint
+        )
+    }
 }
 ```
-2. 在for循环绘制黄色星(整颗星)
+效果图![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3b4a093108694e8ba50aadd2cbcd1261~tplv-k3u1fbpfcp-watermark.image)
+
+绘制背景的5颗灰色的星星也是一样的思路,只是需要先绘制5颗灰色星星,在或者N颗黄色星星,代码就不贴了
+
+## 问题来了
+
+但产品要求评分要精确到小数,所以问题来了,当分数为2.7,那么那0.7分的残缺星星该怎么画呢
+
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1ce60ab05c4a49e0853cd87ff95a3951~tplv-k3u1fbpfcp-watermark.image)
+
+此时需要用到一个方法:canvas.clipRect(int left, int top, int right, int bottom),该方法是用来裁剪绘制区域的,具体用法我就不赘述了,大家参考这篇博客吧,作者讲得还挺详细的[https://www.jianshu.com/p/550d85419121](url)
+
+绘制残缺星星的代码
 ```kotlin
-for (i in 0 until mSelectedCount.toInt()) {
-    canvas.drawBitmap(
-        staredBitmap,
-        paddingStart + i * (mStarImgWidth.toFloat() + mRatingPadding),
-        paddingTop.toFloat(),
-        paint
-    )
-}
-```
-3. 绘制残缺的黄色星
-```kotlin
-val fractional = mSelectedCount - mSelectedCount.toInt()
-if (fractional > 0) {
-    val left =
-        paddingStart + mSelectedCount.toInt() * (mStarImgWidth.toFloat() + mRatingPadding).toInt()
-    val right = left + (mStarImgWidth * fractional).toInt()
+override fun onDraw(canvas: Canvas) {
+    super.onDraw(canvas)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val fractional = 0.7f
     //裁剪半颗星
-    canvas.clipRect(left, paddingTop, right, paddingTop + staredBitmap.height)
-    canvas.drawBitmap(staredBitmap, left.toFloat(), paddingTop.toFloat(), paint)
+    canvas.clipRect(0, 0, (mStarImgWidth*fractional).toInt(), staredBitmap.height)
+    canvas.drawBitmap(staredBitmap, left.toFloat(), 0f, paint)
 }
 ```
-解释说明:fractional指的是残缺星的宽度百分比,然后用canvas.clipRect来裁剪绘制的区域
+效果图![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6866e03a54364a3488ca098f13225a55~tplv-k3u1fbpfcp-watermark.image)
 
-4. onTouch方法,根据触摸的x轴坐标计算分数
+哈哈,到此你们肯定就能够实现如何绘制2.7分的评分了,无非就是以下三步
+- 绘制5颗灰色星星
+- 绘制2颗黄色星星
+- 绘制1颗裁剪0.7倍的黄色星星
+
+在源码中有一处小小的优化,就是灰色星星不用绘制5颗,只需要绘制黄色星星没覆盖的地方,避免浪费
+具体代码如下:
+![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/479872ba110a40e78946d084eefc6223~tplv-k3u1fbpfcp-watermark.image)
+
+好了,现在贴一下目前的代码和效果图
 ```kotlin
-override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!mIsSupportDrag) {
-            return super.onTouchEvent(event)
-        }
-        //将星星和间距作为一组控件块
-        val chunkWidth = mStarImgWidth + mRatingPadding
-        //计算出包含多少个控件块,也就是占多少颗星,多少分
-        var newCount = ((event.x - paddingStart.toFloat()) / chunkWidth)
-        //计算出多滑出的百分比(一组控件块的)
-        val starPaddingPercent: Float = (newCount - newCount.toInt())
-        //计算出多滑出的百分比(一颗星的)
-        var starPercent: Float = chunkWidth * starPaddingPercent / mStarImgWidth
-        //将一颗星的百分比强制限制到1也就是100%
-        if (starPercent > 1) {
-            starPercent = 1f
-        }
-        //加上画出的百分比,得出新的分数
-        newCount = newCount.toInt() + starPercent
-        //最后根据步长类型,调整分数
-        newCount = adjustRatingSelectedCount(newCount)
-        if (mSelectedCount != newCount) {
-            onRatingChangeListener(newCount)
-        }
-        mSelectedCount = newCount
-        invalidate()
-        return true
-    }
-```
-
-
-
-
-# 完整源码
-### PercentRatingBar.kt
-```kotlin
-/**
- * @createTime 2020/11/9 10:19
- * @author 崔兴旺
- * @description
- */
-class PercentRatingBar : View {
-
-    companion object {
-        const val TAG: String = "PercentRatingBar"
-
-        const val RATING_STEP_FULL = 0                          //整颗星
-        const val RATING_STEP_HALF = 1                          //半颗星
-        const val RATING_STEP_EXACTLY = 2                       //精确到具体刻度比例
-    }
-
-    private val defaultRatingTotalCount = 5                     //默认星星总个数为5星
-    private var mStarImgWidth = 0                               //星星宽度
-    private var mStarImgHeight = 0                              //星星高度
-    private var mContext: Context                               //上下文
-    private lateinit var staredBitmap: Bitmap                   //选中的星星bitmap
-    private lateinit var notStarBitmap: Bitmap                  //未选中的星星bitmap
-
-    private var mTotalScore: Int = defaultRatingTotalCount      //总分数
-    private var mSelectedCount: Float = 0f                      //评分(支持小数)
-    private var mStep: Int = 1                                  //步长
-    private var mSelectedImg = 0                                //选中的星星图片资源id
-    private var mNotSelectImg = 0                               //未选中的星星图片资源id
-    private var mRatingPadding = 0                              //星星之间的间距,单位px
-    private var mIsSupportDrag = true                           //是否支持拖动
-
-    var onRatingChangeListener = { ratingValue: Float -> Unit }
-
-    constructor(context: Context) : super(context) {
-        mContext = context
-        initView(null)
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        mContext = context
-        initView(attrs)
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
-        context, attrs, defStyleAttr
-    ) {
-        mContext = context
-        initView(attrs)
-    }
-
-    private fun initView(attrs: AttributeSet?) {
-        val array = context.obtainStyledAttributes(attrs, R.styleable.PercentRatingBar)
-        mSelectedImg = array.getResourceId(
-            R.styleable.PercentRatingBar_ratingSelectedImg, R.drawable.selected_star
-        )
-        mNotSelectImg = array.getResourceId(
-            R.styleable.PercentRatingBar_ratingNotSelectImg, R.drawable.not_select_star
-        )
-        mTotalScore =
-            array.getInteger(R.styleable.PercentRatingBar_ratingTotalScore, defaultRatingTotalCount)
-        mSelectedCount = array.getFloat(R.styleable.PercentRatingBar_ratingSelectedScore, 0f)
-        mRatingPadding = array.getDimensionPixelSize(R.styleable.PercentRatingBar_ratingPadding, 0)
-        mStep = array.getInteger(R.styleable.PercentRatingBar_ratingStep, RATING_STEP_FULL)
-        mIsSupportDrag = array.getBoolean(R.styleable.PercentRatingBar_ratingIsSupportDrag, true)
-
-        array.recycle()
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!mIsSupportDrag) {
-            return super.onTouchEvent(event)
-        }
-        //将星星和间距作为一组控件块
-        val chunkWidth = mStarImgWidth + mRatingPadding
-
-        //计算出包含多少个控件块,也就是占多少颗星,多少分
-        var newCount = ((event.x - paddingStart.toFloat()) / chunkWidth)
-
-        //计算出多滑出的百分比(一组控件块的)
-        val starPaddingPercent: Float = (newCount - newCount.toInt())
-
-        //计算出多滑出的百分比(一颗星的)
-        var starPercent: Float = chunkWidth * starPaddingPercent / mStarImgWidth
-
-        //将一颗星的百分比强制限制到1也就是100%
-        if (starPercent > 1) {
-            starPercent = 1f
-        }
-
-        newCount = newCount.toInt() + starPercent
-
-        newCount = adjustRatingSelectedCount(newCount)
-
-
-        if (mSelectedCount != newCount) {
-            onRatingChangeListener(newCount)
-        }
-        mSelectedCount = newCount
-        invalidate()
-        return true
-    }
-
-    override fun onDraw(canvas: Canvas) {
+val totalScore=5        //总分写死为5分
+val score=2.7f          //评分写死为2.7分
+override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        if (mSelectedCount > mTotalScore) {
-            //限制评分,最高只能设置为星星总个数
-            mSelectedCount = mTotalScore.toFloat()
-        }
-
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         //绘制底部灰色星(未选中的)
-        for (i in mSelectedCount.toInt() until mTotalScore) {
+        for (i in score.toInt() until totalScore) {
             canvas.drawBitmap(
-                notStarBitmap,
-                paddingStart + i * (mStarImgWidth.toFloat() + mRatingPadding),
-                paddingTop.toFloat(),
-                paint
+                notStarBitmap, i * (mStarImgWidth.toFloat()), 0f, paint
             )
         }
 
-        //绘制黄色星(选中的)
-        for (i in 0 until mSelectedCount.toInt()) {
+        val fractional = score-score.toInt()//2.7分:代表残缺星星的评分
+
+        //绘制黄色星(选中的整颗星)
+        for (i in 0 until score.toInt()) {
             canvas.drawBitmap(
-                staredBitmap,
-                paddingStart + i * (mStarImgWidth.toFloat() + mRatingPadding),
-                paddingTop.toFloat(),
-                paint
+                staredBitmap, i * (mStarImgWidth.toFloat()), 0f, paint
             )
         }
 
-        //绘制半颗星
-        val fractional = mSelectedCount - mSelectedCount.toInt()
-        if (fractional > 0) {
-            val left =
-                paddingStart + mSelectedCount.toInt() * (mStarImgWidth.toFloat() + mRatingPadding).toInt()
-            val right = left + (mStarImgWidth * fractional).toInt()
-            //裁剪半颗星
-            canvas.clipRect(left, paddingTop, right, paddingTop + staredBitmap.height)
-            canvas.drawBitmap(staredBitmap, left.toFloat(), paddingTop.toFloat(), paint)
-        }
+        //计算绘制的左侧位置和右侧位置
+        val left =
+            paddingStart + score.toInt() * (mStarImgWidth.toFloat()).toInt()
+        val right = left + (mStarImgWidth * fractional).toInt()
+
+        //裁剪半颗星
+        canvas.clipRect(left, 0, right, staredBitmap.height)
+        canvas.drawBitmap(staredBitmap, left.toFloat(), 0f, paint)
     }
+```
+效果图![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/287e25ec22d54331a018ea60d9687125~tplv-k3u1fbpfcp-watermark.image)
 
-    /**
-     * 调整选中的星星个数
-     */
-    private fun adjustRatingSelectedCount(ratingSelectedCount: Float): Float {
-        var newRatingSelectedCount: Float
-        when (mStep) {
-            RATING_STEP_FULL -> {
-                newRatingSelectedCount = ratingSelectedCount.roundToInt().toFloat()
-            }
-            RATING_STEP_HALF -> {
-                var fractional = ratingSelectedCount - ratingSelectedCount.toInt()
-                fractional = if (fractional <= 0.5) {
-                    0f
-                } else {
-                    0.5f
-                }
-                newRatingSelectedCount = ratingSelectedCount.toInt() + fractional
-            }
-            RATING_STEP_EXACTLY -> {
-                newRatingSelectedCount = ratingSelectedCount
-            }
-            else -> {
-                newRatingSelectedCount = ratingSelectedCount.roundToInt().toFloat()
-            }
-        }
+# 实现滑动评分效果
+## 在看代码之前先看一张说明图
+![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/39117648e26c40498d4938bb01daed63~tplv-k3u1fbpfcp-watermark.image)
+解释:
+- paddingStart:就是官方的android:paddingStart属性,代表左边距
+- mStarImgWidth:星星的宽度
+- mRatingPadding:两颗星星的左右间距
+- mStarImgWidth加mRatingPadding作为一个整体,我将其称为:控件块,代码中的变量名叫做:chunkWidth,(起名字真是个麻烦的事情)![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f37d6e5dd3744e078b58190812647958~tplv-k3u1fbpfcp-watermark.image)
 
-        if (newRatingSelectedCount < 0) {
-            newRatingSelectedCount = 0f
-        } else if (newRatingSelectedCount > mTotalScore) {
-            newRatingSelectedCount = mTotalScore.toFloat()
-        }
-
-        return newRatingSelectedCount
+## 具体逻辑代码
+```kotlin
+override fun onTouchEvent(event: MotionEvent): Boolean {
+    if (!mIsSupportDrag) {
+        return super.onTouchEvent(event)
     }
-
-    /**
-     * 设置总分数
-     */
-    fun setTotalScore(value: Int) {
-        mTotalScore = value
-        requestLayout()
-        invalidate()
+    //将星星和间距作为一组控件块
+    val chunkWidth = mStarImgWidth + mRatingPadding
+    //计算出包含多少个控件块,也就是占多少颗星,多少分
+    var newCount = ((event.x - paddingStart.toFloat()) / chunkWidth)
+    //计算出多滑出的百分比(一组控件块的)
+    val starPaddingPercent: Float = (newCount - newCount.toInt())
+    //计算出多滑出的百分比(一颗星的)
+    var starPercent: Float = chunkWidth * starPaddingPercent / mStarImgWidth
+    //将一颗星的百分比强制限制到1也就是100%
+    if (starPercent > 1) {
+        starPercent = 1f
     }
-
-    /**
-     * 设置分数
-     */
-    fun setScore(value: Float) {
-        val newValue = adjustRatingSelectedCount(value)
-        if (mSelectedCount != newValue) {
-            onRatingChangeListener(newValue)
-        }
-        mSelectedCount = newValue
-        invalidate()
+    //加上画出的百分比,得出新的分数
+    newCount = newCount.toInt() + starPercent
+    //最后根据步长类型,调整分数
+    newCount = adjustRatingSelectedCount(newCount)
+    if (mSelectedCount != newCount) {
+        onRatingChangeListener(newCount)
     }
-
-    /**
-     * 设置步长
-     * @see PercentRatingBar.RATING_STEP_FULL
-     * @see PercentRatingBar.RATING_STEP_HALF
-     * @see PercentRatingBar.RATING_STEP_EXACTLY
-     */
-    fun setStep(@RatingStep ratingStep: Int) {
-        mStep = ratingStep
-        invalidate()
-    }
-
-    /**
-     * 设置星星图片资源id
-     */
-    fun setImageRes(selectedImg: Int, notSelectImg: Int) {
-        mSelectedImg = selectedImg
-        mNotSelectImg = notSelectImg
-        requestLayout()
-        invalidate()
-    }
-
-    /**
-     * 设置星星间距(单位:px)
-     */
-    fun setRatingPadding(ratingPadding: Int) {
-        mRatingPadding = ratingPadding
-        requestLayout()
-        invalidate()
-    }
-
-    /**
-     * 获取总分数
-     */
-    fun getTotalScore(): Int {
-        return mTotalScore
-    }
-
-    /**
-     * 获取分数
-     */
-    fun getScore(): Float {
-        return mSelectedCount
-    }
-
-    /**
-     * 设置是否支持拖动(默认支持)
-     */
-    fun setRatingIsSupportDrag(ratingIsSupportDrag: Boolean) {
-        mIsSupportDrag = ratingIsSupportDrag
-    }
-
-    /**
-     * 是否支持拖动(默认支持)
-     */
-    fun getRatingIsSupportDrag(): Boolean {
-        return mIsSupportDrag
-    }
-
-
-    @Override
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        // 获取宽-测量规则的模式和大小
-        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        // 获取高-测量规则的模式和大小
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-        staredBitmap = BitmapFactory.decodeResource(resources, mSelectedImg)
-        notStarBitmap = BitmapFactory.decodeResource(resources, mNotSelectImg)
-        mStarImgWidth = staredBitmap.width
-        mStarImgHeight = staredBitmap.height
-
-        val mWidth =
-            mTotalScore * (mStarImgWidth.toFloat() + mRatingPadding).toInt() - mRatingPadding + paddingStart + paddingEnd
-        val mHeight = mStarImgHeight + paddingTop + paddingBottom
-
-        // 当布局参数设置为wrap_content时，设置默认值
-        if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT && getLayoutParams().height == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            setMeasuredDimension(mWidth, mHeight)
-            // 宽 / 高任意一个布局参数为= wrap_content时，都设置默认值
-        } else if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            setMeasuredDimension(mWidth, heightSize)
-        } else if (layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            setMeasuredDimension(widthSize, mHeight)
-        }
-    }
+    mSelectedCount = newCount
+    invalidate()
+    return true
 }
 ```
-### ratingview_attr.xml
-```xml
-<resources>
-    <declare-styleable name="PercentRatingBar">
-        <attr name="ratingSelectedImg" format="reference"/>     <!--选中的星星图片资源id-->
-        <attr name="ratingNotSelectImg" format="reference"/>    <!--未选中的星星图片资源id-->
-        <attr name="ratingSelectedScore" format="float"/>       <!--评分(支持小数)-->
-        <attr name="ratingTotalScore" format="integer"/>        <!--总分数-->
-        <attr name="ratingPadding" format="dimension"/>         <!--星星之间的间距,单位px-->
-        <attr name="ratingIsSupportDrag" format="boolean"/>     <!--是否支持拖动-->
-        <attr name="ratingStep" format="enum">                  <!--星星渲染模式(步长)-->
-            <enum name="full" value="0"/>       <!--整颗星-->
-            <enum name="half" value="1"/>       <!--半颗星-->
-            <enum name="exactly" value="2"/>    <!--精确到具体刻度比例-->
-        </attr>
-    </declare-styleable>
-</resources>
-```
+## 算法讲解
+what?算法讲解是不可能讲解的,这辈子都不可能讲解(主要是我表达能力有限,容易让你们失去阅读兴趣,干扰你们思路~)
 
-
-
-
-
+![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8b9aafd49efc421ba09a9317cc293844~tplv-k3u1fbpfcp-watermark.image)
