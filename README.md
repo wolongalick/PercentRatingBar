@@ -15,7 +15,7 @@ buildscript {
 
 ```
 dependencies {
-    implementation 'com.wolongalick.widget:PercentRatingBar:1.0.0'
+    implementation 'com.wolongalick.widget:PercentRatingBar:1.0.1'
 }
 ```
 # 快速使用
