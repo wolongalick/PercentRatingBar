@@ -1,4 +1,4 @@
-package com.wolongalick.percent_rating_bar
+package com.wolongalick.widget
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -6,11 +6,11 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
-import com.wolongalick.percent_rating_bar.annotation.RatingStep
-import com.wolongalick.rercent_rating_bar.R
+import com.wolongalick.annotation.RatingStep
+import com.wolongalick.widget.prb.R
 import kotlin.math.roundToInt
 
 
@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
  * @author 崔兴旺
  * @description
  */
-class PercentRatingBar : ViewGroup {
+class PercentRatingBar : View {
 
     companion object {
         const val TAG: String = "PercentRatingBar"
@@ -171,7 +171,6 @@ class PercentRatingBar : ViewGroup {
             newRatingSelectedCount = ratingMaxCount.toFloat()
         }
 
-        Log.i(TAG, "计算出ratingSelectedCount:${newRatingSelectedCount}")
         return newRatingSelectedCount
     }
 
@@ -191,12 +190,12 @@ class PercentRatingBar : ViewGroup {
         val mHeight = starImgHeight + paddingTop + paddingBottom
 
         // 当布局参数设置为wrap_content时，设置默认值
-        if (layoutParams.width == LayoutParams.WRAP_CONTENT && getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
+        if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT && getLayoutParams().height == ViewGroup.LayoutParams.WRAP_CONTENT) {
             setMeasuredDimension(mWidth, mHeight)
             // 宽 / 高任意一个布局参数为= wrap_content时，都设置默认值
-        } else if (layoutParams.width == LayoutParams.WRAP_CONTENT) {
+        } else if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
             setMeasuredDimension(mWidth, heightSize)
-        } else if (layoutParams.height == LayoutParams.WRAP_CONTENT) {
+        } else if (layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
             setMeasuredDimension(widthSize, mHeight)
         }
     }

@@ -26,5 +26,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation project(path: ':library')
 }

@@ -35,7 +35,7 @@ dependencies {
 publish{
     repoName = 'maven'
     userOrg = 'wolongalick'
-    groupId = 'com.wolongalick'
+    groupId = 'com.wolongalick.widget'
     artifactId = 'PercentRatingBar'
     publishVersion = '1.0.0'
     desc = '一个按可以按滑动百分比来评分的控件'

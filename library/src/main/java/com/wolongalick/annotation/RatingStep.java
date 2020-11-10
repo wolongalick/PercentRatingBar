@@ -1,9 +1,9 @@
-package com.wolongalick.percent_rating_bar.annotation;
+package com.wolongalick.annotation;
 
 import androidx.annotation.IntDef;
 
 
-import com.wolongalick.percent_rating_bar.PercentRatingBar;
+import com.wolongalick.widget.PercentRatingBar;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,4 +1,4 @@
-package com.wolongalick.percent_rating_bar
+package com.wolongalick.widget.demo
 
 import android.content.Context
 

@@ -1,12 +1,11 @@
-package com.wolongalick.percent_rating_bar.demo
+package com.wolongalick.widget.demo
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import com.wolongalick.percent_rating_bar.DensityUtils
-import com.wolongalick.percent_rating_bar.PercentRatingBar
+import com.wolongalick.widget.PercentRatingBar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.math.roundToInt
 

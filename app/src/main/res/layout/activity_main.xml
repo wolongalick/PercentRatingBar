@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.wolongalick.percent_rating_bar.PercentRatingBar
+        <com.wolongalick.widget.PercentRatingBar
             android:id="@+id/percentRatingBar"
             android:background="#80BDE89E"
             android:layout_width="wrap_content"
@@ -23,7 +23,6 @@
             app:ratingMaxCount="10"
             app:ratingPadding="2dp"
             app:ratingStep="exactly"
-            app:ratingIsSupportDrag="false"
             android:layout_height="wrap_content" />
     </RelativeLayout>
 
@@ -184,7 +183,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="重置UI"
+        android:layout_gravity="end"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
         android:onClick="resetUI" />
-
 
 </LinearLayout>
