@@ -2,6 +2,7 @@
 百分比评分控件
 
 ![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo_cover.jpg)
+
 ![image](https://github.com/wolongalick/PercentRatingBar/blob/master/img/demo.gif)
 
 # 依赖方式
