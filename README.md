@@ -84,7 +84,7 @@ ratingStep| 星星步长(full:整颗星、half:半颗星、exactly:精确到具�
 ## 我们先画一颗星看看效果
 ![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d4013f687fbd4237851d37da82b91911~tplv-k3u1fbpfcp-watermark.image)
 
-不过没关系,我们可以换个改为在onMeasure中获取bitmap,并将其作为全局变量存起来(因为后面要讲到计算星星的宽高以及整个自定义view宽高,所以本身也是需要在onMeasure中写的)
+不过没关系,我们可以换个改为在onMeasure中获取bitmap,并将其作为全局变量存起来(因为要计算星星的宽高以及整体自定义view宽高,所以本身也是需要在onMeasure中写的)
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/74a0cf7f13f74434a6faab1d475ef6e8~tplv-k3u1fbpfcp-watermark.image)
 
@@ -107,7 +107,7 @@ override fun onDraw(canvas: Canvas) {
 ```
 效果图![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3b4a093108694e8ba50aadd2cbcd1261~tplv-k3u1fbpfcp-watermark.image)
 
-绘制背景的5颗灰色的星星也是一样的思路,只是需要先绘制5颗灰色星星,在或者N颗黄色星星,代码就不贴了
+绘制背景的5颗灰色的星星也是一样的思路,只是需要先绘制5颗灰色星星,再绘制N颗黄色星星,代码就不贴了
 
 ## 问题来了
 
@@ -202,7 +202,7 @@ override fun onTouchEvent(event: MotionEvent): Boolean {
     if (starPercent > 1) {
         starPercent = 1f
     }
-    //加上画出的百分比,得出新的分数
+    //加上滑出的百分比,得出新的分数
     newCount = newCount.toInt() + starPercent
     //最后根据步长类型,调整分数
     newCount = adjustRatingSelectedCount(newCount)
