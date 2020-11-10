@@ -107,6 +107,7 @@ if (fractional > 0) {
 }
 ```
 解释说明:fractional指的是残缺星的宽度百分比,然后用canvas.clipRect来裁剪绘制的区域
+
 4. onTouch方法,根据触摸的x轴坐标计算分数
 ```kotlin
 override fun onTouchEvent(event: MotionEvent): Boolean {
