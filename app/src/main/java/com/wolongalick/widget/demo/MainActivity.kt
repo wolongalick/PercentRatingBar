@@ -130,5 +130,9 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
         percentRatingBar.setImageRes(R.drawable.yellow_star, R.drawable.black_star)
     }
 
+    fun updateRatingImageLargeBlue(view: View) {
+        percentRatingBar.setImageRes(R.drawable.large_blue_star, R.drawable.large_black_star)
+    }
+
 
 }

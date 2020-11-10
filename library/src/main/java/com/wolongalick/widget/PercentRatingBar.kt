@@ -38,7 +38,7 @@ class PercentRatingBar : View {
 
     private var mTotalScore: Int = defaultRatingTotalCount      //总分数
     private var mSelectedCount: Float = 0f                      //评分(支持小数)
-    private var mStep: Int = 1
+    private var mStep: Int = 1                                  //步长(渲染整颗星、半颗星、根据具体滑动比例)
     private var mSelectedImg = 0                                //选中的星星图片资源id
     private var mNotSelectImg = 0                               //未选中的星星图片资源id
     private var mRatingPadding = 0                              //星星之间的间距,单位px
@@ -87,26 +87,20 @@ class PercentRatingBar : View {
         }
         //将星星和间距作为一组控件块
         val chunkWidth = mStarImgWidth + mRatingPadding
-
         //计算出包含多少个控件块,也就是占多少颗星,多少分
         var newCount = ((event.x - paddingStart.toFloat()) / chunkWidth)
-
         //计算出多滑出的百分比(一组控件块的)
         val starPaddingPercent: Float = (newCount - newCount.toInt())
-
         //计算出多滑出的百分比(一颗星的)
         var starPercent: Float = chunkWidth * starPaddingPercent / mStarImgWidth
-
         //将一颗星的百分比强制限制到1也就是100%
         if (starPercent > 1) {
             starPercent = 1f
         }
-
+        //加上画出的百分比,得出新的分数
         newCount = newCount.toInt() + starPercent
-
+        //最后根据步长类型,调整分数
         newCount = adjustRatingSelectedCount(newCount)
-
-
         if (mSelectedCount != newCount) {
             onRatingChangeListener(newCount)
         }
@@ -135,7 +129,7 @@ class PercentRatingBar : View {
             )
         }
 
-        //绘制黄色星(选中的)
+        //绘制黄色星(选中的整颗星)
         for (i in 0 until mSelectedCount.toInt()) {
             canvas.drawBitmap(
                 staredBitmap,

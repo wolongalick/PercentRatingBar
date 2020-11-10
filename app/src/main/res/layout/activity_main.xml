@@ -18,6 +18,7 @@
             android:background="#80BDE89E"
             android:layout_width="wrap_content"
             android:padding="20dp"
+            android:paddingStart="40dp"
             app:ratingSelectedImg="@drawable/selected_star"
             app:ratingNotSelectImg="@drawable/not_select_star"
             app:ratingSelectedScore="3.7"
@@ -133,6 +134,12 @@
             android:src="@drawable/blue_star"
             android:layout_height="wrap_content"
             android:onClick="updateRatingImageBlue" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/large_blue_star"
+            android:layout_height="wrap_content"
+            android:onClick="updateRatingImageLargeBlue" />
 
 
     </LinearLayout>
