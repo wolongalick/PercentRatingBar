@@ -29,18 +29,15 @@ dependencies {
 # 完整使用
 ```xml
 <com.wolongalick.widget.PercentRatingBar
-    android:id="@+id/percentRatingBar"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="20dp"
-    app:ratingStaredImg="@drawable/selected_star"
-    app:ratingNotStarImg="@drawable/not_select_star"
-    app:ratingSelectedCount="3.7"
-    app:ratingMaxCount="10"
+    app:ratingSelectedImg="@drawable/selected_star"
+    app:ratingNotSelectImg="@drawable/not_select_star"
+    app:ratingSelectedScore="3.7"
+    app:ratingTotalScore="10"
     app:ratingPadding="2dp"
     app:ratingIsSupportDrag="true"
-    app:ratingStep="exactly"
-    />
+    app:ratingStep="exactly" />
 ```
 
 # 自定义属性详解
