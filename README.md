@@ -1,5 +1,5 @@
 # PercentRatingBar
-百分比评分控件
+按滑动百分比来评分的控件
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/079533118d624aa38e65ec73f3febf37~tplv-k3u1fbpfcp-watermark.image)
 
